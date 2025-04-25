@@ -1,11 +1,11 @@
-name: Accept and Merge Pull Request
+name: Auto-Merge PR
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  merge-pull-request:
+  merge:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -14,6 +14,8 @@ jobs:
       - name: Enable Auto-Merge
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GH_PAT }}  # Usa un PAT aquí
           pull-request-number: ${{ github.event.pull_request.number }}
           merge-method: merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # Fuerza el uso del PAT
