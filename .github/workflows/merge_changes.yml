@@ -1,21 +1,37 @@
-name: Auto-Merge PR
+name: Auto Approve and Merge
 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
 
 jobs:
-  merge:
+  approve-and-merge:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
       contents: write
+      pull-requests: write
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Opcional: Agrega aquí tus tests o checks de CI
+      - name: Run Tests
+        run: echo "Aquí irían tus tests o validaciones"
+
+      - name: Auto Approve
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'APPROVE'
+            })
+
       - name: Enable Auto-Merge
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
-          token: ${{ secrets.GH_PAT }}  # Usa un PAT aquí
+          token: ${{ secrets.ADMIN_PAT }}  # PAT de un usuario administrador
           pull-request-number: ${{ github.event.pull_request.number }}
           merge-method: merge
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # Fuerza el uso del PAT
