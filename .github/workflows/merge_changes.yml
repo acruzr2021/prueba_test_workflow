@@ -14,20 +14,9 @@ jobs:
       - name: Run Tests
         run: echo "Aquí irían tus tests o validaciones"
 
-      - name: Auto Approve
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              event: 'APPROVE'
-            })
-
       - name: Enable Auto-Merge
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.GH_TOKEN }}
           pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: merge
+          merge-method: "SQUASH"
